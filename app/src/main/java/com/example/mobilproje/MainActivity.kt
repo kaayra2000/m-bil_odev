@@ -3,19 +3,11 @@ package com.example.mobilproje
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import androidx.navigation.Navigation
 import com.example.mobilproje.databinding.ActivityMainBinding
-import com.google.firebase.database.FirebaseDatabase
-import kotlin.properties.Delegates
+
 
 class MainActivity : AppCompatActivity() {
 

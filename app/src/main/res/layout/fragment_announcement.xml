@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/baseLinear"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/password_24"/>
+    <LinearLayout
+        android:id="@+id/parentLinear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/upperLinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation = "horizontal">
+            <TextView
+                android:id="@+id/upperLinearTitle"
+                android:layout_width="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:text="Message"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/upperLinearText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="asdsda"
+                android:layout_margin="@dimen/text_margin"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/lowerLinear"
+            android:layout_height="wrap_content"
+            android:orientation = "horizontal">
+            <TextView
+                android:id="@+id/lowerLinearTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:fontFamily="sans-serif-black"
+                android:text="Date"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/lowerLinearText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="asdsda"
+                android:layout_margin="@dimen/text_margin"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</LinearLayout>

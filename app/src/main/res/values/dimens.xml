@@ -4,4 +4,5 @@
     <dimen name="centerilaze">35dp</dimen>
     <dimen name="verticalText">12dp</dimen>
     <dimen name="dpp_12">12dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

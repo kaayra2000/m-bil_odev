@@ -19,6 +19,9 @@
             app:popUpTo="@id/profile"
             app:popUpToInclusive="true"
             app:destination="@id/profile" />
+        <action
+            android:id="@+id/action_FirstFragment_to_itemFragment"
+            app:destination="@id/itemFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -54,4 +57,9 @@
             app:popUpToInclusive="true"
             app:destination="@id/FirstFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/itemFragment"
+        android:name="com.example.mobilproje.ItemFragment"
+        android:label="fragment_announcement_list"
+        tools:layout="@layout/fragment_announcement_list" />
 </navigation>

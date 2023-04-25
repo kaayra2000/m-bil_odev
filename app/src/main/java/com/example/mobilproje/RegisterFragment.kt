@@ -17,9 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
-import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
 import com.example.mobilproje.databinding.FragmentRegisterBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

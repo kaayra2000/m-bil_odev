@@ -2,13 +2,11 @@ package com.example.mobilproje
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.example.mobilproje.R
 import kotlinx.android.synthetic.main.toast_message.view.*
 
 

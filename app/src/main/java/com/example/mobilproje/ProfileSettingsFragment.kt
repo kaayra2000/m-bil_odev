@@ -2,7 +2,6 @@ package com.example.mobilproje
 
 import GraduatPerson
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -21,10 +20,6 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.findNavController
-import com.example.mobilproje.databinding.FragmentProfileBinding
 import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

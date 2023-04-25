@@ -1,29 +1,23 @@
 package com.example.mobilproje
 
 import GraduatPerson
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mobilproje.databinding.FragmentProfileBinding
-import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.io.ByteArrayOutputStream
 
 // TODO: Rename parameter arguments, choose names that match
 
