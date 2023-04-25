@@ -1,6 +1,7 @@
 package com.example.mobilproje
 
 import GraduatPerson
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
@@ -12,19 +13,23 @@ import android.view.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.mobilproje.databinding.FragmentProfileBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.fragment_profile_settings.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 // TODO: Rename parameter arguments, choose names that match
 
 
 
 class ProfileFragment : Fragment() {
-    lateinit var userName : String
+    lateinit var email : String
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     val database = FirebaseDatabase.getInstance().reference
@@ -52,7 +57,7 @@ class ProfileFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                val bundle = bundleOf("userName" to userName)
+                val bundle = bundleOf("email" to email)
                 findNavController().navigate(R.id.action_profileSettings_to_profileFragment, bundle)
                 return true
             }
@@ -72,7 +77,7 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        userName = arguments?.getString("userName").toString()
+        email = arguments?.getString("email").toString()
         var toast = CustomToast(context)
 
 
@@ -92,27 +97,47 @@ class ProfileFragment : Fragment() {
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
 
-        binding.exitButton.setOnClickListener {
-            editor.putString("username", "")
-            editor.putString("password", "")
-            editor.putBoolean("loginFlag", false)
-            editor.apply()
-            findNavController().navigate(R.id.action_profileSettings_to_FirstFragment)
+        binding.createProfileButton.setOnClickListener {
+            val bundle = bundleOf("email" to email)
+            findNavController().navigate(R.id.action_profile_to_createProfileFragment,bundle)
         }
 
-        val getValue = object : ValueEventListener {
-            override fun onCancelled(databaseError: DatabaseError) {
-                // handle error
-            }
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                userName?.let {
-                    updateUser(dataSnapshot.child("users").child(it))
-                    initValues()
-                }
-            }
+        binding.findGradButton.setOnClickListener {
+            val bundle = bundleOf("email" to email)
+            findNavController().navigate(R.id.action_profile_to_findFragment,bundle)
         }
-        database.addValueEventListener(getValue)
-        database.addListenerForSingleValueEvent(getValue)
+
+        binding.exitButton.setOnClickListener {
+            val alertDialogBuilder = AlertDialog.Builder(requireContext())
+            alertDialogBuilder.setTitle("Are you sure?")
+            alertDialogBuilder
+                .setMessage("Do you really want to log out?")
+                .setCancelable(false)
+                .setPositiveButton("Yes") { _, _ ->
+                    editor.putString("email", "")
+                    editor.putString("password", "")
+                    editor.putBoolean("loginFlag", false)
+                    editor.apply()
+                    findNavController().navigate(R.id.action_profileSettings_to_FirstFragment)
+                }
+                .setNegativeButton("No") { dialog, _ -> dialog.cancel() }
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
+        }
+
+        lifecycleScope.launch {
+            val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            val username = parts[0]
+            user = database.child("users").child(username).get().await().getValue(
+                GraduatPerson::class.java
+            )!!
+
+            updateUser()
+
+            initValues()
+        }
+
 
         return binding.root
     }
@@ -120,40 +145,33 @@ class ProfileFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        userName = sharedPrefs.getString("username","").toString()
+        email = sharedPrefs.getString("email","").toString()
     }
-    private fun updateUser(i : DataSnapshot){
+    private fun updateUser(){
         try{
-        val situation = situation.valueOf((i.child("situation").getValue()).toString())
-        user = GraduatPerson(
-            email = i.child("email").getValue().toString(),
-            name = i.child("name").getValue().toString(),
-            surName = i.child("surName").getValue().toString(),
-            password = i.child("password").getValue().toString(),
-            phoneNumber = i.child("phoneNumber").getValue().toString(),
-            startDate =  i.child("startDate").getValue().toString(),
-            endDate =  i.child("endDate").getValue().toString(),
-            situation = situation,
-            userName = i.child("userName").getValue().toString(),
-            photo = i.child("photo").getValue().toString()
-
-        )
-        initValues()}catch(e : Exception){
+        initValues()
+        }catch(e : Exception){
             e.printStackTrace()
         }
 
     }
     private fun initValues(){
 
-        user?.let {binding.gradOption.setText(user.situation?.toString())
+        if (::user.isInitialized) {
+            // user değişkeni atanmış durumda
+            binding.gradOption.setText(user.situation?.toString())
             binding.nameText.setText(user.name)
             binding.surNameText.setText(user.surName)
             binding.startDateText.setText(user.startDate)
             binding.endDateText.setText(user.endDate)
             binding.userPhoto.setImageDrawable(context?.let { user.photo?.let { it1 ->
-                decodeStringToDrawable(
-                    it1, it)
-            } })  }
+                decodeStringToDrawable(it1, it)
+            } })
+        } else {
+            // user değişkeni henüz atanmamış durumda
+            // gerekli işlemler yapılabilir
+        }
+
 
     }
 

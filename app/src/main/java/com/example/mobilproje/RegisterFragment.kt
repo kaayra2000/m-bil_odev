@@ -7,18 +7,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.util.Base64
 import android.os.Bundle
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
-import androidx.fragment.app.Fragment
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.mobilproje.databinding.FragmentRegisterBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -27,6 +29,7 @@ import situation
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -42,6 +45,7 @@ class RegisterFragment : Fragment() {
     val database = FirebaseDatabase.getInstance().reference
     private val binding get() = _binding!!
     private var pickImage = 100
+    private lateinit var auth: FirebaseAuth
     lateinit var toast : CustomToast
     lateinit var sharedPrefs : SharedPreferences
     lateinit var editor : SharedPreferences.Editor
@@ -69,6 +73,7 @@ class RegisterFragment : Fragment() {
         _binding = FragmentRegisterBinding.inflate(inflater, container, false)
         imageView = binding.userPhoto
         toast = CustomToast(context)
+        auth = FirebaseAuth.getInstance()
         binding.startDateText.setOnClickListener {
             initDatePicker(binding.startDateText)
             binding.startDateText.setError(null)
@@ -76,9 +81,8 @@ class RegisterFragment : Fragment() {
 
         initEditTexts()
 
-        binding.userNameText.setText(sharedPrefs?.getString("username", "").toString())
-        binding.passwordText.setText(sharedPrefs?.getString("password", "").toString())
-
+        binding.passwordText.setText(sharedPrefs.getString("password", "").toString())
+        binding.emailText.setText(sharedPrefs.getString("email", "").toString())
         binding.endDateText.setOnClickListener {
             initDatePicker(binding.endDateText)
             binding.endDateText.setError(null)
@@ -106,18 +110,16 @@ class RegisterFragment : Fragment() {
             val surName = binding.surNameText.text.toString()
             val phoneNumber = binding.phoneNumberText.text.toString()
             val password = binding.passwordText.text.toString()
-            val userName = binding.userNameText.text.toString()
             val endDate = binding.endDateText.text.toString()
             val startDate = binding.startDateText.text.toString()
             val rePassword = binding.passwordRetypeText.text.toString()
             val photo = imageUri?.let { it1 -> convertBitmap(it1) }
 
-            editor.putString("username", userName)
             editor.putString("password", password)
             editor.apply()
 
             val getError = controlAllFields(email, name,surName, phoneNumber, startDate
-                ,endDate, userName, password, situation.valueOf(binding.gradOption.selectedItem.toString()),
+                ,endDate, password, situation.valueOf(binding.gradOption.selectedItem.toString()),
                 photo, rePassword)
             if (!getError){
                 return@setOnClickListener
@@ -130,21 +132,16 @@ class RegisterFragment : Fragment() {
                         for (i in snapshot.children) {
                             val tmpEmail = i.child("email").getValue().toString()
                             val tmpPhoneNumber = i.child("phoneNumber").getValue().toString()
-                            val tmpUserName = i.child("userName").getValue().toString()
-
-                            if (tmpEmail == email || tmpPhoneNumber == phoneNumber || tmpUserName == userName) {
+                            if (tmpEmail == email || tmpPhoneNumber == phoneNumber) {
                                 if (tmpEmail == email) message += "Email is exists\n"
                                 if (tmpPhoneNumber == phoneNumber) message += "Phone Number is exists\n"
-                                if (tmpUserName == userName) message += "Username is exists\n"
                                 toast.showMessage(message,false)
                                 flag = false
                                 break
                             }
                         }
                         if(flag){
-                            database.child("users").child(userName).setValue(person)
-                            toast.showMessage("Successfully Registered",true)
-                            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+                            authUsers(person.email,person.password)
                         }
                     }
 
@@ -155,26 +152,7 @@ class RegisterFragment : Fragment() {
 
                 }
             )
-            /*database.child("users").child(userName).addListenerForSingleValueEvent(
-                object : ValueEventListener{
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if(snapshot.exists()){
-                            toast.showMessage("Username is exists",false)
-                        }
-                        else{
-                            database.child("users").child(userName).setValue(person)
-                            toast.showMessage("Successfully Registered",true)
-                            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-                        }
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {
-
-                    }
-
-
-                }
-            )*/
 
 
 
@@ -207,7 +185,7 @@ class RegisterFragment : Fragment() {
 
     private fun controlAllFields(
         email: String?, name: String?, surName: String?,
-        phoneNumber: String, startDate: String?, endDate: String?, userName: String,
+        phoneNumber: String, startDate: String?, endDate: String?,
         password: String, situation: situation, photo: String?, rePassword: String
     ): Boolean {
         var returnVal = true
@@ -239,7 +217,7 @@ class RegisterFragment : Fragment() {
             val sdf = SimpleDateFormat("dd-MM-yyyy")
             val firstDate: Date = sdf.parse(startDate)
             val secondDate: Date = sdf.parse(endDate)
-            person = GraduatPerson(name,surName,email,phoneNumber, startDate, endDate, situation,userName,password,
+            person = GraduatPerson(name,surName,email,phoneNumber, startDate, endDate, situation,password,
                 photo)
             if (firstDate.after(secondDate) /*|| secondDate.after(today)*/){
                 startDateEditText.setError("Incorrect Date")
@@ -257,13 +235,6 @@ class RegisterFragment : Fragment() {
             }
         }
 
-
-        if (!USER_NAME_REGEX.toRegex().matches(userName)){
-            returnVal = false
-            userNameEditText.setError("username must start with a letter and be at least 8 letters")
-        }
-
-
         if (!PASSWORD_REGEX.toRegex().matches(password)){
             returnVal = false
             passwordNameEditText.setError("Password must contain at least one " +
@@ -275,6 +246,37 @@ class RegisterFragment : Fragment() {
         return returnVal
     }
 
+    private fun authUsers(email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    auth.currentUser!!.sendEmailVerification()
+                        .addOnSuccessListener {
+                            toast.showMessage("Email sended",true)
+                            updateUI(auth.currentUser)
+                        }.addOnFailureListener{
+                            toast.showMessage("Email cannot send",false)
+
+                        }
+
+                } else {
+                    updateUI(null)
+                    toast.showMessage("Email already used",false)
+                }
+            }
+    }
+
+    private fun updateUI(user: FirebaseUser?) {
+        if (user != null) {
+            val email = person.email
+            val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
+                .toTypedArray()
+            val username = parts[0]
+            database.child("users").child(username).setValue(person)
+            toast.showMessage("Successfully Registered",true)
+            findNavController().popBackStack()
+        }
+    }
     private fun initDatePicker(editText: EditText){
         val c = Calendar.getInstance()
 
@@ -326,7 +328,6 @@ class RegisterFragment : Fragment() {
     }
 
     private fun initEditTexts(){
-        userNameEditText = binding.userNameText
         passwordNameEditText = binding.passwordText
         nameEditText = binding.nameText
         surNameEditText = binding.surNameText

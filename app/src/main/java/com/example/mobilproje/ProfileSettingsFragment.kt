@@ -2,6 +2,7 @@ package com.example.mobilproje
 
 import GraduatPerson
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract.CommonDataKinds.Email
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import android.text.method.PasswordTransformationMethod
@@ -21,6 +23,7 @@ import androidx.fragment.app.Fragment
 import android.widget.EditText
 import android.widget.ImageView
 import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -41,9 +44,9 @@ class ProfileSettingsFragment : Fragment() {
     lateinit var sharedPrefs : SharedPreferences
     lateinit var editor : SharedPreferences.Editor
     lateinit var contextThis: Context
+    lateinit var email: String
     lateinit var imageView: ImageView
     private var imageUri: Uri? = null
-    lateinit var userNameEditText: EditText
     lateinit var passwordNameEditText: EditText
     lateinit var nameEditText: EditText
     lateinit var surNameEditText: EditText
@@ -56,6 +59,7 @@ class ProfileSettingsFragment : Fragment() {
         super.onAttach(context)
         sharedPrefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPrefs.edit()
+        email = sharedPrefs.getString("email","").toString()
 
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +85,7 @@ class ProfileSettingsFragment : Fragment() {
         }
 
         binding.passwordText.transformationMethod = PasswordTransformationMethod()
-        var userName = arguments?.getString("userName")
+        email = arguments?.getString("email").toString()
         imageView = binding.userPhoto
         initEditTexts()
         imageView.setOnClickListener {
@@ -107,94 +111,58 @@ class ProfileSettingsFragment : Fragment() {
             }
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
+                if(::email.isInitialized){
+                    val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
+                        .toTypedArray()
+                    val username = parts[0]
+                    updateUser(dataSnapshot.child("users").child(username))
+                }
 
-                userName?.let {
-                    updateUser(dataSnapshot.child("users").child(it))
 
-            }
         }
 
     }
         binding.updateButton.setOnClickListener{
-            val email = binding.emailText.text.toString()
-            val name = binding.nameText.text.toString()
-            val surName = binding.surNameText.text.toString()
-            val phoneNumber = binding.phoneNumberText.text.toString()
-            val password = binding.passwordText.text.toString()
-            val currUserName = binding.userNameText.text.toString()
-            val endDate = binding.endDateText.text.toString()
-            val startDate = binding.startDateText.text.toString()
-            var byteArray : String? = ""
-            binding.userPhoto.drawable?.let {
-                byteArray= convertBitmap(binding.userPhoto.drawable)
-            }
+            val alertDialogBuilder = AlertDialog.Builder(requireContext())
+            alertDialogBuilder.setTitle("Are you sure?")
+            alertDialogBuilder.setMessage("Do you want to update your profile?")
+            alertDialogBuilder.setPositiveButton("Yes") { dialog, _ ->
+                val email = binding.emailText.text.toString()
+                val name = binding.nameText.text.toString()
+                val surName = binding.surNameText.text.toString()
+                val phoneNumber = binding.phoneNumberText.text.toString()
+                val password = binding.passwordText.text.toString()
+                val endDate = binding.endDateText.text.toString()
+                val startDate = binding.startDateText.text.toString()
+                var byteArray : String? = ""
+                binding.userPhoto.drawable?.let {
+                    byteArray= convertBitmap(binding.userPhoto.drawable)
+                }
 
-
-            val errorDetect = controlAllFields(email, name,surName, phoneNumber, startDate
-                ,endDate, currUserName, password, situation.valueOf(binding.gradOption.selectedItem.toString()),
-                byteArray)
-            if (!errorDetect){
-                return@setOnClickListener
-            }
-
-
-            val database = FirebaseDatabase.getInstance().reference
-            if(!userName.equals(currUserName)){
-                database.child("users").addListenerForSingleValueEvent(
-                        object : ValueEventListener{
-                            override fun onDataChange(snapshot: DataSnapshot) {
-
-
-                                var flag = true
-                                var message = ""
-                                for (i in snapshot.children) {
-                                    val tmpEmail = i.child("email").getValue().toString()
-                                    val tmpPhoneNumber = i.child("phoneNumber").getValue().toString()
-                                    val tmpUserName = i.child("userName").getValue().toString()
-
-                                    if ((tmpEmail == email || tmpPhoneNumber == phoneNumber || tmpUserName == currUserName) && tmpUserName != userName) {
-                                        if (tmpEmail == email) message += "Email is exists\n"
-                                        if (tmpPhoneNumber == phoneNumber) message += "Phone Number is exists\n"
-                                        if (tmpUserName == currUserName) message += "Username is exists\n"
-                                        toast.showMessage(message.dropLast(1),false)
-                                        flag = false
-                                        break
-                                    }
-                                }
-
-                                if(flag){
-                                    database.child("users").child(currUserName).setValue(user)
-                                    val tmp = userName
-                                    userName =  currUserName
-                                    tmp?.let { it1 -> database.child("users").child(it1).removeValue() }
-                                    toast.showMessage("Successfully Updated",true)
-                                    editor.putString("username", currUserName)
-                                    editor.putString("password", password)
-                                    editor.apply()
-                                }
-
-
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-
-                            }
-
-                        }
-                )
-            }else{
-                database.child("users").child(currUserName).setValue(user)
-                val toast = CustomToast(context)
-                toast.setMessage("Successfully Updated")
-                toast.setSuccessColor()
-                toast.show()
-                editor.putString("username", currUserName)
-                editor.putString("password", password)
+                val errorDetect = controlAllFields(name,surName, phoneNumber, startDate
+                    ,endDate, password, situation.valueOf(binding.gradOption.selectedItem.toString()),
+                    byteArray)
+                if (!errorDetect){
+                    return@setPositiveButton
+                }
+                val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
+                    .toTypedArray()
+                val username = parts[0]
+                val person = GraduatPerson(name = name, surName = surName, email = email, phoneNumber = phoneNumber,
+                    startDate = startDate, endDate = endDate, situation = situation.valueOf(binding.gradOption.selectedItem.toString()), password = password,
+                    photo = byteArray)
+                val currUser = FirebaseAuth.getInstance().currentUser
+                currUser?.updatePassword(person.password)
+                editor.putString("password",person.password)
                 editor.apply()
+                database.child("users").child(username).setValue(person)
+                toast.showMessage("Succesfully Updated",true)
             }
-
-
-
+            alertDialogBuilder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val alertDialog = alertDialogBuilder.create()
+            alertDialog.show()
 
         }
 
@@ -222,16 +190,14 @@ class ProfileSettingsFragment : Fragment() {
             startDate =  i.child("startDate").getValue().toString(),
             endDate =  i.child("endDate").getValue().toString(),
             situation = situation,
-            userName = i.child("userName").getValue().toString(),
             photo = i.child("photo").getValue().toString()
 
         )
         initValues()
     }
     private fun initValues(){
-        binding.gradOption.setSelection(user.situation.ordinal)
+        binding.gradOption.setSelection(user.situation!!.ordinal)
         binding.emailText.setText(user.email)
-        binding.userNameText.setText(user.userName)
         binding.nameText.setText(user.name)
         binding.surNameText.setText(user.surName)
         binding.phoneNumberText.setText(user.phoneNumber)
@@ -243,8 +209,8 @@ class ProfileSettingsFragment : Fragment() {
 
 
     }
-    private fun controlAllFields(email : String?, name: String?, surName: String?,
-                                 phoneNumber: String, startDate: String?, endDate: String?, userName: String,
+    private fun controlAllFields( name: String?, surName: String?,
+                                 phoneNumber: String, startDate: String?, endDate: String?,
                                  password: String, situation: situation,photo: String?): Boolean {
         var returnVal = true
 
@@ -262,11 +228,6 @@ class ProfileSettingsFragment : Fragment() {
             returnVal = false
         }
 
-        if (email?.length!!<5 || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.toString()).matches()){
-            eMailEditText.setError("Incorrect Mail")
-            returnVal = false
-        }
-
         if (!PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)){
             phoneNumberEditText.setError("Incorrect Phone Number")
             returnVal = false
@@ -275,8 +236,6 @@ class ProfileSettingsFragment : Fragment() {
             val sdf = SimpleDateFormat("dd-MM-yyyy")
             val firstDate: Date = sdf.parse(startDate)
             val secondDate: Date = sdf.parse(endDate)
-            user = GraduatPerson(name,surName,email,phoneNumber, startDate, endDate, situation,userName,password,
-                photo)
             if (firstDate.after(secondDate) /*|| secondDate.after(today)*/){
                 startDateEditText.setError("Incorrect Date")
                 endDateEditText.setError("Incorrect Date")
@@ -285,19 +244,14 @@ class ProfileSettingsFragment : Fragment() {
         }
         else{
             returnVal = false
-            if(startDate?.length!!<3){
+            if(startDate.length<3){
                 startDateEditText.setError("Date is null")
             }
-            if(startDate?.length!!<3){
+            if(startDate.length<3){
                 endDateEditText.setError("Date is null")
             }
         }
 
-
-        if (!USER_NAME_REGEX.toRegex().matches(userName)){
-            returnVal = false
-            userNameEditText.setError("username must start with a letter and be at least 8 letters")
-        }
 
 
         if (!PASSWORD_REGEX.toRegex().matches(password)){
@@ -353,7 +307,6 @@ class ProfileSettingsFragment : Fragment() {
     }
 
     private fun initEditTexts(){
-        userNameEditText = binding.userNameText
         passwordNameEditText = binding.passwordText
         nameEditText = binding.nameText
         surNameEditText = binding.surNameText

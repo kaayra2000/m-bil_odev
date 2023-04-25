@@ -56,10 +56,26 @@
             app:popUpTo="@id/FirstFragment"
             app:popUpToInclusive="true"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_profile_to_createProfileFragment"
+            app:destination="@id/createProfileFragment" />
+        <action
+            android:id="@+id/action_profile_to_findFragment"
+            app:destination="@id/findFragment" />
     </fragment>
     <fragment
         android:id="@+id/itemFragment"
         android:name="com.example.mobilproje.ItemFragment"
         android:label="fragment_announcement_list"
         tools:layout="@layout/fragment_announcement_list" />
+    <fragment
+        android:id="@+id/createProfileFragment"
+        android:name="com.example.mobilproje.CreateProfileFragment"
+        android:label="fragment_create_profile"
+        tools:layout="@layout/fragment_create_profile" />
+    <fragment
+        android:id="@+id/findFragment"
+        android:name="com.example.mobilproje.FindFragment"
+        android:label="fragment_find"
+        tools:layout="@layout/fragment_find" />
 </navigation>

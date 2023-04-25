@@ -19,11 +19,13 @@
                 android:layout_marginRight="@dimen/dpp_12"
                 android:id="@+id/userPhoto" />
             <EditText
-                android:id="@+id/userNameText"
+                android:id="@+id/emailText"
                 style="@style/EditTextStyle"
-                android:drawableLeft="@drawable/baseline_username_box_24"
                 android:layout_marginVertical="@dimen/verticalText"
-                android:hint="@string/username" />
+                android:hint="@string/email"
+                android:drawableLeft="@drawable/baseline_email_24"
+                android:inputType="textEmailAddress"/>
+
             <EditText
                 android:id="@+id/passwordText"
                 style="@style/EditTextStyle"
@@ -52,13 +54,6 @@
                 android:layout_marginVertical="@dimen/verticalText"
                 android:hint="@string/surName" />
 
-            <EditText
-                android:id="@+id/emailText"
-                style="@style/EditTextStyle"
-                android:layout_marginVertical="@dimen/verticalText"
-                android:hint="@string/email"
-                android:drawableLeft="@drawable/baseline_email_24"
-                android:inputType="textEmailAddress"/>
 
             <EditText
                 android:id="@+id/phoneNumberText"

@@ -33,4 +33,7 @@
     <string name="cikis">Exit</string>
     <string name="retype_password">Retype Password</string>
     <string name="show_password">Show Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_profile">Create Profile</string>
+    <string name="find">Find</string>
 </resources>
