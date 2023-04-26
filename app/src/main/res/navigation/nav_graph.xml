@@ -77,5 +77,23 @@
         android:id="@+id/findFragment"
         android:name="com.example.mobilproje.FindFragment"
         android:label="fragment_find"
-        tools:layout="@layout/fragment_find" />
+        tools:layout="@layout/fragment_find" >
+        <action
+            android:id="@+id/action_findFragment_to_listStudentFragment"
+            app:destination="@id/listStudentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/listStudentFragment"
+        android:name="com.example.mobilproje.ListStudentFragment"
+        android:label="fragment_list_student"
+        tools:layout="@layout/fragment_list_student" >
+        <action
+            android:id="@+id/action_listStudentFragment_to_studentInfoFragment"
+            app:destination="@id/studentInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/studentInfoFragment"
+        android:name="com.example.mobilproje.StudentInfoFragment"
+        android:label="fragment_student_info"
+        tools:layout="@layout/fragment_student_info" />
 </navigation>

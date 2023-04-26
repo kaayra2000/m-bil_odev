@@ -52,7 +52,6 @@ class RegisterFragment : Fragment() {
     lateinit var imageView: ImageView
     lateinit var person: GraduatPerson
     private var imageUri: Uri? = null
-    lateinit var userNameEditText: EditText
     lateinit var passwordNameEditText: EditText
     lateinit var nameEditText: EditText
     lateinit var surNameEditText: EditText

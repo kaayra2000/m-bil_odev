@@ -5,10 +5,29 @@
     android:layout_height="match_parent"
     tools:context=".FindFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:orientation="vertical"
+       android:gravity="center"
+       android:layout_height="match_parent">
+       <Button
+           android:id="@+id/findStudentButton"
+           android:layout_width="wrap_content"
+           android:textAllCaps="false"
+           android:text="@string/find_student"
+           android:layout_height="wrap_content"/>
+       <Button
+           android:id="@+id/announcementButton"
+           android:layout_width="wrap_content"
+           android:text="@string/announcement"
+           android:textAllCaps="false"
+           android:layout_height="wrap_content"/>
+       <Button
+           android:id="@+id/photoButton"
+           android:layout_width="wrap_content"
+           android:textAllCaps="false"
+           android:text="@string/photo"
+           android:layout_height="wrap_content"/>
+   </LinearLayout>
 
 </FrameLayout>

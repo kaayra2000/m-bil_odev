@@ -15,11 +15,12 @@
     <string name="gender">Gender</string>
     <string name="photo">Photo</string>
     <string-array name="optionArray">
-        <item>Licence</item>
-        <item>Degree</item>
-        <item>Doctorate</item>
+        <item>Name</item>
+        <item>Surname</item>
+        <item>Work Info</item>
+        <item>Situation</item>
     </string-array>
-    <string name="phoneNumber">Phone Number</string>
+    <string name="phoneNumber">Phone Number(5xx xxx xx xx)</string>
     <string name="login">Login</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
@@ -36,4 +37,10 @@
     <string name="forgot_password">Forgot Password?</string>
     <string name="create_profile">Create Profile</string>
     <string name="find">Find</string>
+    <string name="work_info_country_city_company">Work Info(Country,City,Company)</string>
+    <string name="social_media_info_optional">Social Media Info(Optional)</string>
+    <string name="create_update">Create/Update</string>
+    <string name="delete_profile">Delete Profile</string>
+    <string name="find_student">Find Student</string>
+    <string name="announcement">Announcement</string>
 </resources>
