@@ -78,12 +78,23 @@ class StudentInfoFragment : Fragment() {
         startActivity(Intent.createChooser(intent, "Choose an email app:"))
     }
 
-    private fun goCallIntent(phone: String){
-        val intent = Intent(Intent.ACTION_DIAL).apply {
-            data = Uri.parse("tel:$phone")
+    private fun goCallIntent(phoneNumber: String) {
+        val url = "https://api.whatsapp.com/send?phone=+90$phoneNumber"
+        val packageManager = requireActivity().packageManager
+        val i = Intent(Intent.ACTION_VIEW)
+
+        // WhatsApp uygulaması yüklü mü?
+        i.`package` = "com.whatsapp"
+        if (i.resolveActivity(packageManager) != null) {
+            i.data = Uri.parse(url)
+            startActivity(i)
+        } else {
+            // WhatsApp web sitesi açılacak
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://web.whatsapp.com/send?phone=$phoneNumber"))
+            startActivity(intent)
         }
-        startActivity(intent)
     }
+
 
 
     private fun convertStringToBitmap(string: String?): Bitmap? {
