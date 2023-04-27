@@ -21,6 +21,13 @@ data class GraduatPerson(
     var photo: String?= ""
 ) : Serializable
 
+data class Announcement(
+    var date :String= "",
+    var message: String= "",
+    var photo: String= "",
+    var title: String= ""
+) : Serializable
+
 
 data class StudentProfile(
     var name :String= "",

@@ -1,11 +1,14 @@
 package com.example.mobilproje
 
 import GraduatPerson
+import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -31,10 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-/**
- * A simple [Fragment] subclass as the second destination in the navigation.
- */
-val USER_NAME_REGEX = "^[A-Za-z][A-Za-z0-9_]{7,29}$"
 val PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
 class RegisterFragment : Fragment() {
 
@@ -88,8 +87,7 @@ class RegisterFragment : Fragment() {
         }
 
         imageView.setOnClickListener {
-            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-            startActivityForResult(gallery, pickImage)
+            selectPhoto()
         }
         val getValue = object : ValueEventListener {
             override fun onCancelled(databaseError: DatabaseError) {
@@ -164,10 +162,42 @@ class RegisterFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == pickImage) {
-            imageUri = data?.data
-            imageView.setImageURI(imageUri)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                pickImage -> {
+                    val imageUri = data?.data
+                    if (imageUri != null) {
+                        imageView.setImageURI(imageUri)
+                    } else {
+                        val extras = data?.extras
+                        val imageBitmap = extras?.get("data") as Bitmap
+                        imageView.setImageBitmap(imageBitmap)
+                    }
+                }
+            }
         }
+    }
+    private fun selectPhoto(){
+        val options = arrayOf<CharSequence>("Galerry", "Camera", "Delete Photo")
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Select Photo")
+        builder.setItems(options) { dialog, item ->
+            when {
+                options[item] == "Galerry" -> {
+                    val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                    startActivityForResult(gallery, pickImage)
+                }
+                options[item] == "Camera" -> {
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(cameraIntent, pickImage)
+                }
+                options[item] == "Delete Photo" -> {
+                    imageView.setImageBitmap(null)
+                }
+            }
+        }
+        builder.show()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

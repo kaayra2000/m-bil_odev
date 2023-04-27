@@ -25,7 +25,7 @@ class FindFragment : Fragment() {
         }
 
         binding.announcementButton.setOnClickListener {
-
+            findNavController().navigate(R.id.action_findFragment_to_announcementListFragment)
         }
 
         binding.photoButton.setOnClickListener {

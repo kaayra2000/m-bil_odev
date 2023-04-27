@@ -15,11 +15,17 @@
     <string name="gender">Gender</string>
     <string name="photo">Photo</string>
     <string-array name="optionArray">
+        <item>Licence</item>
+        <item>Degree</item>
+        <item>Doctorate</item>
+    </string-array>
+    <string-array name="selectOption">
         <item>Name</item>
         <item>Surname</item>
         <item>Work Info</item>
         <item>Situation</item>
     </string-array>
+
     <string name="phoneNumber">Phone Number(5xx xxx xx xx)</string>
     <string name="login">Login</string>
     <string name="hello_first_fragment">Hello first fragment</string>
@@ -43,4 +49,10 @@
     <string name="delete_profile">Delete Profile</string>
     <string name="find_student">Find Student</string>
     <string name="announcement">Announcement</string>
+    <string name="add_announcement">Add Announcement</string>
+    <string name="announcements">Announcements</string>
+    <string name="title">Title</string>
+    <string name="end_date">End Date</string>
+    <string name="save">Save</string>
+    <string name="message">Message</string>
 </resources>

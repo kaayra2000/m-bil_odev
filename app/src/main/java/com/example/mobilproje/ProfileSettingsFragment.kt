@@ -89,8 +89,7 @@ class ProfileSettingsFragment : Fragment() {
         imageView = binding.userPhoto
         initEditTexts()
         imageView.setOnClickListener {
-            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-            startActivityForResult(gallery, pickImage)
+            selectPhoto()
         }
 
         binding.startDateText.setOnClickListener {
@@ -174,10 +173,42 @@ class ProfileSettingsFragment : Fragment() {
 }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == pickImage) {
-            imageUri = data?.data
-            imageView.setImageURI(imageUri)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                pickImage -> {
+                    val imageUri = data?.data
+                    if (imageUri != null) {
+                        imageView.setImageURI(imageUri)
+                    } else {
+                        val extras = data?.extras
+                        val imageBitmap = extras?.get("data") as Bitmap
+                        imageView.setImageBitmap(imageBitmap)
+                    }
+                }
+            }
         }
+    }
+    private fun selectPhoto(){
+        val options = arrayOf<CharSequence>("Galerry", "Camera", "Delete Photo")
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Select Photo")
+        builder.setItems(options) { dialog, item ->
+            when {
+                options[item] == "Galerry" -> {
+                    val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                    startActivityForResult(gallery, pickImage)
+                }
+                options[item] == "Camera" -> {
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(cameraIntent, pickImage)
+                }
+                options[item] == "Delete Photo" -> {
+                    imageView.setImageBitmap(null)
+                }
+            }
+        }
+        builder.show()
     }
     private fun updateUser(i : DataSnapshot){
         val situation = situation.valueOf((i.child("situation").getValue()).toString())

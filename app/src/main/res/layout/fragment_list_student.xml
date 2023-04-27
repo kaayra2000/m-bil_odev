@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:gravity="center_horizontal"
-            android:entries="@array/optionArray" />
+            android:entries="@array/selectOption" />
 
 
     </LinearLayout>

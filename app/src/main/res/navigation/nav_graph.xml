@@ -81,6 +81,9 @@
         <action
             android:id="@+id/action_findFragment_to_listStudentFragment"
             app:destination="@id/listStudentFragment" />
+        <action
+            android:id="@+id/action_findFragment_to_announcementListFragment"
+            app:destination="@id/announcementListFragment" />
     </fragment>
     <fragment
         android:id="@+id/listStudentFragment"
@@ -96,4 +99,17 @@
         android:name="com.example.mobilproje.StudentInfoFragment"
         android:label="fragment_student_info"
         tools:layout="@layout/fragment_student_info" />
+    <fragment
+        android:id="@+id/announcementListFragment"
+        android:name="AnnouncementListFragment"
+        android:label="AnnouncementListFragment" >
+        <action
+            android:id="@+id/action_announcementListFragment_to_addAnnouncement"
+            app:destination="@id/addAnnouncement" />
+    </fragment>
+    <fragment
+        android:id="@+id/addAnnouncement"
+        android:name="com.example.mobilproje.AddAnnouncement"
+        android:label="fragment_add_announcement"
+        tools:layout="@layout/fragment_add_announcement" />
 </navigation>
