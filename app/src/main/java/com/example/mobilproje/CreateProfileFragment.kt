@@ -50,6 +50,8 @@ class CreateProfileFragment : Fragment() {
     lateinit var gradOption: Spinner
     lateinit var username: String
     lateinit var studentProfile: StudentProfile
+    private var imageBitmap: Bitmap? = null
+    private var photo: String? = ""
     private var imageUri: Uri? = null
     private var pickImage = 100
     lateinit var email: String
@@ -77,8 +79,7 @@ class CreateProfileFragment : Fragment() {
         }
 
         imageView.setOnClickListener {
-            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-            startActivityForResult(gallery, pickImage)
+            selectPhoto()
         }
 
         registerButton.setOnClickListener {
@@ -94,9 +95,21 @@ class CreateProfileFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == pickImage) {
-            imageUri = data?.data
-            imageView.setImageURI(imageUri)
+
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                pickImage -> {
+                    imageUri = data?.data
+                    if (imageUri != null) {
+                        binding.userPhoto.setImageURI(imageUri)
+                    } else {
+                        imageUri = null
+                        val extras = data?.extras
+                        imageBitmap = extras?.get("data") as Bitmap
+                        binding.userPhoto.setImageBitmap(imageBitmap)
+                    }
+                }
+            }
         }
     }
     private fun initViewFields(){
@@ -151,6 +164,10 @@ class CreateProfileFragment : Fragment() {
     }
 
     private fun createStudentProfile(){
+        photo = imageUri?.let { it1 -> convertBitmap(it1) }
+        if (imageUri == null)
+            if (imageBitmap != null)
+                photo = imageBitmap?.let { it-> bitmapToString(it) }
         studentProfile = StudentProfile(
             name = nameEditText.text.toString(),
             surName = surNameText.text.toString(),
@@ -158,12 +175,18 @@ class CreateProfileFragment : Fragment() {
             phoneNumber = phoneNumberEditText.text.toString(),
             workInfo = workEditText.text.toString(),
             socialMedia = socialMediaEditText.text.toString(),
-            photo = imageUri?.let { it1 -> convertBitmap(it1) },
+            photo = photo,
             situation = situation.valueOf(binding.gradOption.selectedItem.toString()),
             userName = username
         )
     }
 
+    fun bitmapToString(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
    private fun convertBitmap(imageUri: Uri) : String? {
         val inputStream = context?.contentResolver?.openInputStream(imageUri)
         val buffer = ByteArrayOutputStream()
@@ -250,5 +273,28 @@ class CreateProfileFragment : Fragment() {
              }
 
 
+    }
+    private fun selectPhoto(){
+        val options = arrayOf<CharSequence>("Galerry", "Camera", "Delete Photo")
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Select Photo")
+        builder.setItems(options) { dialog, item ->
+            when {
+                options[item] == "Galerry" -> {
+                    val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+                    startActivityForResult(gallery, pickImage)
+                }
+                options[item] == "Camera" -> {
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(cameraIntent, pickImage)
+                }
+                options[item] == "Delete Photo" -> {
+                    binding.userPhoto.setImageBitmap(null)
+                    imageBitmap = null
+                    imageUri = null
+                }
+            }
+        }
+        builder.show()
     }
 }

@@ -32,7 +32,9 @@ class AddAnnouncement : Fragment() {
     private var _binding: FragmentAddAnnouncementBinding? = null
     private val binding get() = _binding!!
     private var pickImage = 100
+    private var imageBitmap: Bitmap? = null
     private var imageUri: Uri? = null
+    private var photo: String? = ""
     lateinit var toast: CustomToast
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,7 +77,10 @@ class AddAnnouncement : Fragment() {
     private fun addAnnouncement(){
         val message = binding.messageText.text.toString()
         val date = binding.dateText.text.toString()
-        val photo = convertBitmap(imageUri!!)
+        if (imageUri != null)
+            photo = convertBitmap(imageUri!!)
+        else
+            photo = bitmapToString(imageBitmap!!)
         val title = binding.titleText.text.toString()
         val ann = Announcement(date = date, photo = photo!!, message = message, title = title)
         database.child("announcement").push().setValue(ann)
@@ -83,18 +88,18 @@ class AddAnnouncement : Fragment() {
 
     private fun controlFields(): Boolean{
         var flag = true
-        if (binding.titleText.toString().isEmpty()) {
-            binding.messageText.error = "Title can't be empty"
+        if (binding.titleText.text.toString().length < 3) {
+            binding.titleText.error = "Title too short"
             flag = false
         }
 
-        if (binding.titleText.text.toString().length > 15) {
-            binding.messageText.error = "Title is too long"
+        if (binding.titleText.text.toString().length > 25) {
+            binding.titleText.error = "Title is too long"
             flag = false
         }
 
-        if (binding.messageText.toString().isEmpty()) {
-            binding.messageText.error = "Message can't be empty"
+        if (binding.messageText.text.toString().length < 10) {
+            binding.messageText.error = "Message too short"
             flag = false
         }
 
@@ -104,8 +109,11 @@ class AddAnnouncement : Fragment() {
         }
 
         if (imageUri == null) {
-            toast.showMessage("Please select a photo",false)
-            flag = false
+            if(imageBitmap == null){
+                toast.showMessage("Please select a photo",false)
+                flag = false
+            }
+
         }
         return flag
     }
@@ -142,12 +150,13 @@ class AddAnnouncement : Fragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 pickImage -> {
-                    val imageUri = data?.data
+                    imageUri = data?.data
                     if (imageUri != null) {
                         binding.userPhoto.setImageURI(imageUri)
                     } else {
+                        imageUri = null
                         val extras = data?.extras
-                        val imageBitmap = extras?.get("data") as Bitmap
+                        imageBitmap = extras?.get("data") as Bitmap
                         binding.userPhoto.setImageBitmap(imageBitmap)
                     }
                 }
@@ -172,6 +181,14 @@ class AddAnnouncement : Fragment() {
 
     }
 
+    fun bitmapToString(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+
     private fun selectPhoto(){
         val options = arrayOf<CharSequence>("Galerry", "Camera", "Delete Photo")
         val builder = AlertDialog.Builder(requireContext())
@@ -188,6 +205,8 @@ class AddAnnouncement : Fragment() {
                 }
                 options[item] == "Delete Photo" -> {
                     binding.userPhoto.setImageBitmap(null)
+                    imageBitmap = null
+                    imageUri = null
                 }
             }
         }

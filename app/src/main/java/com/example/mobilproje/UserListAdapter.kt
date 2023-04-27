@@ -1,6 +1,7 @@
 package com.example.mobilproje
 
 import StudentProfile
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -46,12 +47,16 @@ class UserListAdapter(private val userList: List<StudentProfile>, private val fr
 
     inner class UserListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
+        @SuppressLint("SetTextI18n")
         fun bind(user: StudentProfile) = GlobalScope.launch {
             val dataSnapshot = database.child("users").child(user.userName).get().await()
             if (dataSnapshot.exists()) {
                 withContext(Dispatchers.Main) {
-                    itemView.imageView.setImageBitmap(user?.photo?.let { convertStringToBitmap(it) })
-                    itemView.nameText.text = "Name: " + user?.name
+                    itemView.imageView.setImageBitmap(user.photo?.let { convertStringToBitmap(it) })
+                    if(itemView.imageView != null) {
+                        itemView.imageView.background = null
+                    }
+                    itemView.nameText.text = "Name: " + user.name
                     itemView.currClassText.text = "Surname: " + user.surName
                     itemView.durationText.text = "Work Info: " +  user.workInfo
                     itemView.situationText.text = "Situation: " + user.situation!!.situation

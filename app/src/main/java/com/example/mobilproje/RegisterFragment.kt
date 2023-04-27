@@ -52,6 +52,7 @@ class RegisterFragment : Fragment() {
     lateinit var person: GraduatPerson
     private var imageUri: Uri? = null
     lateinit var passwordNameEditText: EditText
+    private var imageBitmap: Bitmap? = null
     lateinit var nameEditText: EditText
     lateinit var surNameEditText: EditText
     lateinit var eMailEditText: EditText
@@ -110,7 +111,10 @@ class RegisterFragment : Fragment() {
             val endDate = binding.endDateText.text.toString()
             val startDate = binding.startDateText.text.toString()
             val rePassword = binding.passwordRetypeText.text.toString()
-            val photo = imageUri?.let { it1 -> convertBitmap(it1) }
+            var photo = imageUri?.let { it1 -> convertBitmap(it1) }
+            if (imageUri == null)
+                if (imageBitmap != null)
+                    photo = imageBitmap?.let { it-> bitmapToString(it) }
 
             editor.putString("password", password)
             editor.apply()
@@ -166,17 +170,24 @@ class RegisterFragment : Fragment() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 pickImage -> {
-                    val imageUri = data?.data
+                    imageUri = data?.data
                     if (imageUri != null) {
-                        imageView.setImageURI(imageUri)
+                        binding.userPhoto.setImageURI(imageUri)
                     } else {
+                        imageUri = null
                         val extras = data?.extras
-                        val imageBitmap = extras?.get("data") as Bitmap
-                        imageView.setImageBitmap(imageBitmap)
+                        imageBitmap = extras?.get("data") as Bitmap
+                        binding.userPhoto.setImageBitmap(imageBitmap)
                     }
                 }
             }
         }
+    }
+    fun bitmapToString(bitmap: Bitmap): String {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
     private fun selectPhoto(){
         val options = arrayOf<CharSequence>("Galerry", "Camera", "Delete Photo")

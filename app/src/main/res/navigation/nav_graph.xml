@@ -84,6 +84,9 @@
         <action
             android:id="@+id/action_findFragment_to_announcementListFragment"
             app:destination="@id/announcementListFragment" />
+        <action
+            android:id="@+id/action_findFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment" />
     </fragment>
     <fragment
         android:id="@+id/listStudentFragment"
@@ -112,4 +115,18 @@
         android:name="com.example.mobilproje.AddAnnouncement"
         android:label="fragment_add_announcement"
         tools:layout="@layout/fragment_add_announcement" />
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.example.mobilproje.GalleryFragment"
+        android:label="fragment_gallery"
+        tools:layout="@layout/fragment_gallery" >
+        <action
+            android:id="@+id/action_galleryFragment_to_viewAndDeletePhoto"
+            app:destination="@id/viewAndDeletePhoto" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewAndDeletePhoto"
+        android:name="com.example.mobilproje.ViewAndDeletePhoto"
+        android:label="fragment_view_and_delete_photo"
+        tools:layout="@layout/fragment_view_and_delete_photo" />
 </navigation>

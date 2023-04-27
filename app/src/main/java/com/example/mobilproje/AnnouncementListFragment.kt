@@ -15,7 +15,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
 
 class AnnouncementListFragment : Fragment() {

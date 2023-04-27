@@ -21,6 +21,12 @@ data class GraduatPerson(
     var photo: String?= ""
 ) : Serializable
 
+data class GalleryItem (
+    var photo: String= "",
+    var date: String = "",
+    var title: String = "",
+    var ownerUserName: String =""
+) : Serializable
 data class Announcement(
     var date :String= "",
     var message: String= "",
