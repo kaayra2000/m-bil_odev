@@ -81,11 +81,10 @@ class GalleryFragment : Fragment() {
 
     private fun getDataAndSetupAdapter() {
         val myRef = database.child("media").ref
-        galleryItems.clear()
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-
+                    galleryItems.clear()
                     for (userSnapshot in dataSnapshot.children) {
                         val user = userSnapshot.getValue(GalleryItem::class.java)
                         user?.let {
