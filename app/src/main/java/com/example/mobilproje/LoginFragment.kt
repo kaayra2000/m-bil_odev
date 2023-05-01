@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -52,12 +53,16 @@ class LoginFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Login"
         changeEnabledStop()
     }
     override fun onAttach(context: Context) {
         super.onAttach(context)
         sharedPrefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPrefs.edit()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Login"
     }
 
 

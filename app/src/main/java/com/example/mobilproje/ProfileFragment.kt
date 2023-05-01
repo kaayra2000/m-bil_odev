@@ -2,6 +2,7 @@ package com.example.mobilproje
 
 import GraduatPerson
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.util.Base64
 import android.view.*
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -43,7 +45,10 @@ class ProfileFragment : Fragment() {
         super.onAttach(context)
         sharedPrefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPrefs.edit()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Profile"
     }
+
 
 
 
@@ -126,6 +131,7 @@ class ProfileFragment : Fragment() {
         }
 
         lifecycleScope.launch {
+            val progressDialog = ProgressDialog.show(requireContext(), "Uploading", "Please wait...", true)
             val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
             val username = parts[0]
@@ -136,6 +142,7 @@ class ProfileFragment : Fragment() {
             updateUser()
 
             initValues()
+            progressDialog.dismiss()
         }
 
 
@@ -146,6 +153,8 @@ class ProfileFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         email = sharedPrefs.getString("email","").toString()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Profile"
     }
     private fun updateUser(){
         try{

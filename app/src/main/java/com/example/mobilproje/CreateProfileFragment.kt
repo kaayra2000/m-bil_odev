@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mobilproje.databinding.FragmentCreateProfileBinding
 import com.example.mobilproje.databinding.FragmentRegisterBinding
@@ -60,7 +61,10 @@ class CreateProfileFragment : Fragment() {
         super.onAttach(context)
         sharedPrefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPrefs.edit()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Create Profile"
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

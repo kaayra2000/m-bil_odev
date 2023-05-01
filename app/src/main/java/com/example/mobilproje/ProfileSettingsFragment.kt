@@ -4,6 +4,7 @@ import GraduatPerson
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -22,6 +23,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -46,7 +48,6 @@ class ProfileSettingsFragment : Fragment() {
     lateinit var contextThis: Context
     lateinit var email: String
     lateinit var imageView: ImageView
-    private var imageUri: Uri? = null
     lateinit var passwordNameEditText: EditText
     lateinit var nameEditText: EditText
     lateinit var surNameEditText: EditText
@@ -54,14 +55,18 @@ class ProfileSettingsFragment : Fragment() {
     lateinit var phoneNumberEditText: EditText
     lateinit var startDateEditText: EditText
     lateinit var endDateEditText: EditText
+    lateinit var progressDialog: ProgressDialog
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         sharedPrefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         editor = sharedPrefs.edit()
         email = sharedPrefs.getString("email","").toString()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Profile Settings"
 
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -71,7 +76,8 @@ class ProfileSettingsFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        progressDialog = ProgressDialog.show(requireContext(), "Uploading", "Please wait...", true)
         _binding = FragmentProfileSettingsBinding.inflate(inflater, container, false)
         contextThis = requireContext()
         toast = CustomToast(context)
@@ -106,15 +112,15 @@ class ProfileSettingsFragment : Fragment() {
 
         val getValue = object : ValueEventListener {
             override fun onCancelled(databaseError: DatabaseError) {
-                // handle error
+                progressDialog.dismiss()
             }
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-
                 if(::email.isInitialized){
                     val parts = email.split("@".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
                     val username = parts[0]
                     updateUser(dataSnapshot.child("users").child(username))
+                    progressDialog.dismiss()
                 }
 
 
@@ -126,6 +132,7 @@ class ProfileSettingsFragment : Fragment() {
             alertDialogBuilder.setTitle("Are you sure?")
             alertDialogBuilder.setMessage("Do you want to update your profile?")
             alertDialogBuilder.setPositiveButton("Yes") { dialog, _ ->
+                progressDialog.show()
                 val email = binding.emailText.text.toString()
                 val name = binding.nameText.text.toString()
                 val surName = binding.surNameText.text.toString()
@@ -154,7 +161,11 @@ class ProfileSettingsFragment : Fragment() {
                 currUser?.updatePassword(person.password)
                 editor.putString("password",person.password)
                 editor.apply()
-                database.child("users").child(username).setValue(person)
+                database.child("users").child(username).setValue(person).addOnSuccessListener {
+                    progressDialog.dismiss()
+                }.addOnCanceledListener {
+                    progressDialog.dismiss()
+                }
                 toast.showMessage("Succesfully Updated",true)
             }
             alertDialogBuilder.setNegativeButton("No") { dialog, _ ->

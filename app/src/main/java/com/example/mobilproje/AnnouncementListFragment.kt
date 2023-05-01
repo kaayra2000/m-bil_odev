@@ -1,8 +1,10 @@
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +27,17 @@ class AnnouncementListFragment : Fragment() {
     private val announcementList = mutableListOf<Announcement>()
 
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Announcements"
+    }
+    override fun onResume() {
+        super.onResume()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Announcements"
+
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

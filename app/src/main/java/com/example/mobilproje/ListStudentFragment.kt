@@ -2,6 +2,8 @@ package com.example.mobilproje
 
 import GraduatPerson
 import StudentProfile
+import android.app.ProgressDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +13,7 @@ import android.widget.AdapterView
 import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +24,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -36,12 +41,14 @@ class ListStudentFragment : Fragment() {
     private lateinit var spinner: Spinner
     val userList = mutableListOf<StudentProfile>()
     private var option = 0
+    lateinit var progressDialog: ProgressDialog
     var textQuery = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        progressDialog = ProgressDialog.show(requireContext(), "Uploading", "Please wait...", true)
         _binding = FragmentListStudentBinding.inflate(inflater, container, false)
         userListRecyclerView = binding.userListRecyclerView
         userListSearchView = binding.searchView
@@ -49,6 +56,17 @@ class ListStudentFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Student List"
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Student List"
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -74,7 +92,11 @@ class ListStudentFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 option = position
                 lifecycleScope.launch {
-                    filter(textQuery)
+                    progressDialog.show()
+                    withContext(Dispatchers.Main) {
+                        filter(textQuery)
+                    }
+                    progressDialog.dismiss()
                 }
                 // selectedValue değişkeni seçilen değere karşılık gelen indis ile güncellenir
             }
@@ -89,7 +111,7 @@ class ListStudentFragment : Fragment() {
 
     private fun getDataAndSetupAdapter() {
         val myRef = database.child("profilestudent").ref
-
+        progressDialog.show()
         myRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 userList.clear()
@@ -106,9 +128,11 @@ class ListStudentFragment : Fragment() {
                     val adapter = UserListAdapter(userList,this@ListStudentFragment)
                     userListRecyclerView.adapter = adapter
                 }
+                progressDialog.dismiss()
             }
 
             override fun onCancelled(error: DatabaseError) {
+                progressDialog.dismiss()
                 Log.d("ListUserFragment", "Verileri alma işlemi başarısız oldu.")
             }
         })

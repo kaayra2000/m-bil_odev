@@ -1,6 +1,8 @@
 package com.example.mobilproje
 
 import StudentProfile
+import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,6 +13,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mobilproje.databinding.FragmentStudentInfoBinding
 import com.google.firebase.database.FirebaseDatabase
@@ -25,11 +28,18 @@ lateinit var studentProfile: StudentProfile
 lateinit var toast : CustomToast
 val database = FirebaseDatabase.getInstance().reference
 private lateinit var userName: String
+lateinit var progressDialog: ProgressDialog
 class StudentInfoFragment : Fragment() {
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Student Profile"
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
+        progressDialog = ProgressDialog.show(requireContext(), "Uploading", "Please wait...", true)
         _binding = FragmentStudentInfoBinding.inflate(inflater, container, false)
         toast = CustomToast(context)
         userName = arguments?.getString("userName").toString()
@@ -42,6 +52,7 @@ class StudentInfoFragment : Fragment() {
                 studentProfile = StudentProfile()
             }
             setTextViewValues()
+            progressDialog.dismiss()
         }
 
         binding.emailText.setOnClickListener {
@@ -54,6 +65,7 @@ class StudentInfoFragment : Fragment() {
         }
         return binding.root
     }
+
 
 
     private fun setTextViewValues(){

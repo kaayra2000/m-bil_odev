@@ -56,4 +56,6 @@
     <string name="save">Save</string>
     <string name="message">Message</string>
     <string name="galerry">Galerry</string>
+    <string name="add">Add Media</string>
+    <string name="delete">Delete</string>
 </resources>

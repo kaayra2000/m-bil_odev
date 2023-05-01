@@ -22,9 +22,9 @@ data class GraduatPerson(
 ) : Serializable
 
 data class GalleryItem (
-    var photo: String= "",
+    var id: String= "",
     var date: String = "",
-    var title: String = "",
+    var downloadUrl: String = "",
     var ownerUserName: String =""
 ) : Serializable
 data class Announcement(

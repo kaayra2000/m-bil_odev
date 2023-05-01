@@ -1,10 +1,12 @@
 package com.example.mobilproje
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.example.mobilproje.databinding.FragmentCreateProfileBinding
@@ -16,6 +18,16 @@ class FindFragment : Fragment() {
     private val binding get() = _binding!!
     lateinit var email: String
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Find"
+    }
+    override fun onResume() {
+        super.onResume()
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Find"
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

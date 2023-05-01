@@ -4,6 +4,7 @@ import Announcement
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -18,6 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.example.mobilproje.databinding.FragmentAddAnnouncementBinding
 import com.example.mobilproje.databinding.FragmentProfileSettingsBinding
 import com.google.firebase.database.FirebaseDatabase
@@ -36,6 +38,14 @@ class AddAnnouncement : Fragment() {
     private var imageUri: Uri? = null
     private var photo: String? = ""
     lateinit var toast: CustomToast
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val activity = context as AppCompatActivity
+        activity.supportActionBar?.title = "Add Announcement"
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
